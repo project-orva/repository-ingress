@@ -35,6 +35,11 @@
         "typescript": "^3.7.5"
     },
     "dependencies": {
-        "@babel/runtime": "^7.9.6"
+        "@babel/runtime": "^7.9.6",
+        "axios": "^0.19.2",
+        "dotenv": "^8.2.0",
+        "dour": "^1.0.3",
+        "pg": "^8.2.1",
+        "sequelize": "^5.21.13"
     }
 }
