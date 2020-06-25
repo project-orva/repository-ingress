@@ -9,11 +9,12 @@ import sequalizeAdapter from './lib/sequalize-model'
 dotenv.config()
 
 const adapter = sequalizeAdapter({
-    database: process.env.DATABASE,
-    username: process.env.USERNAME,
-    password: process.env.PASSWORD,
-    host: process.env.HOST,
-    dialect: 'postgres'
+    database: process.env.DEFAULT_DATABASE,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    dialect: 'postgres',
+    port: Number(process.env.DB_PORT),
 })
 
 compose(
@@ -21,9 +22,10 @@ compose(
     withMiddleware('auth', async (
         ctx: RequestContext, next: MiddlewareNext,
     ) => {
-        const identityToken = ctx.request.headers['X-Identity']
+        const identityToken = ctx.request.headers['x-identity']
+        console.log(ctx.request.headers)
 
-        if (!!identityToken) {
+        if (typeof identityToken === 'undefined') {
             ctx.response.writeHead(400, "invalid headers")
             return
         }
@@ -41,12 +43,10 @@ compose(
         next()
     }),
     handleModel('/account', {
-        accountId: modeler.String,
         accountType: modeler.Number,
         createdOn: modeler.Date,
     }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE]),
     handleModel('/profile', {
-        profileId: modeler.String,
         firstName: modeler.String,
         lastName: modeler.String,
     }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE])

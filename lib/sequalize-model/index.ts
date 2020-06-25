@@ -9,6 +9,7 @@ export interface SequalizeConfiguration {
     password: string,
     dialect: string,
     host: string,
+    post: number,
 }
 
 const covertType = (type: number) => lazyTruth({
@@ -28,6 +29,7 @@ export default (config: SequalizeConfiguration): DataSourceAdapter => {
         config.database,
         config.username,
         config.password, {
+        port: config.port,
         host: config.host,
         dialect: config.dialect,
     })
