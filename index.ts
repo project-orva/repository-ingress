@@ -4,7 +4,7 @@ import { RequestContext, MiddlewareNext, CrudType } from 'dour/types'
 import axios from 'axios';
 import dotenv from 'dotenv';
 
-import sequalizeAdapter from './lib/sequalize-model'
+import sequalizeAdapter from '@dour/sequelize-adapter'
 
 dotenv.config()
 
@@ -23,7 +23,6 @@ compose(
         ctx: RequestContext, next: MiddlewareNext,
     ) => {
         const identityToken = ctx.request.headers['x-identity']
-        console.log(ctx.request.headers)
 
         if (typeof identityToken === 'undefined') {
             ctx.response.writeHead(400, "invalid headers")
@@ -47,7 +46,9 @@ compose(
         createdOn: modeler.Date,
     }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE]),
     handleModel('/profile', {
+        id: modeler.String,
         firstName: modeler.String,
         lastName: modeler.String,
+        accessLevel: modeler.Number,
     }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE])
 ).start(3005, () => console.log('Service started on port 3005'))
