@@ -18,10 +18,15 @@ const adapter = sequalizeAdapter({
 })
 
 compose(
-    withModelRouter(adapter),
     withMiddleware('auth', async (
         ctx: RequestContext, next: MiddlewareNext,
     ) => {
+        console.log(process.env.NODE_ENV, process.env.NODE_ENV === 'dev')
+        if (process.env.NODE_ENV === 'dev') {
+            next()
+            return
+        }
+
         const identityToken = ctx.request.headers['x-identity']
 
         if (typeof identityToken === 'undefined') {
@@ -41,8 +46,17 @@ compose(
 
         next()
     }),
-    handleModel('/account', {
+    withModelRouter(adapter),
+    handleModel('/device', {
+        id: modeler.String,
         accountType: modeler.Number,
+        createdOn: modeler.Date,
+    }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE]),
+    handleModel('/user', {
+        id: modeler.String,
+        accountType: modeler.Number,
+        firstName: modeler.String,
+        lastName: modeler.String,
         createdOn: modeler.Date,
     }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE]),
     handleModel('/profile', {
@@ -50,5 +64,9 @@ compose(
         firstName: modeler.String,
         lastName: modeler.String,
         accessLevel: modeler.Number,
-    }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE])
+    }, [CrudType.CREATE, CrudType.READ, CrudType.UPDATE]),
+    handleModel('/connection-registry', {
+        userId: modeler.String,
+        deviceId: modeler.String,
+    }, [CrudType.UPDATE, CrudType.READ])
 ).start(3005, () => console.log('Service started on port 3005'))
